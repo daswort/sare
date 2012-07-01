@@ -1,5 +1,5 @@
 <div class="hero-unit" style="overflow:hidden;">
-  <h2>Perfil de <?php echo Sesion::get('usuario'); ?></h2>
+  <h2>Perfil de <?php echo $this->perfil[0]['USERNAME'] ?></h2>
   <div id="cont-perfil" class="row">
     <div class="span6">
       <div class="row">
@@ -22,6 +22,6 @@
           <p>{ encriptada } <a href="#">cambiar</a></p>
         </div>
       </div>
+    </div>
   </div>
-</div>
 </div>
