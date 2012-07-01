@@ -51,7 +51,7 @@
 				<li class="dropdown" id="menu1">
                   <a class="dropdown-toggle" data-toggle="dropdown" href="#menu1"> Bienvenido <?php echo Sesion::get('usuario'); ?> <b class="caret"></b></a>
                   <ul class="dropdown-menu">
-                    <li><a href="#"><i class="icon-user"></i> Perfil</a></li>
+                    <li><a href="<?php echo URL; ?>perfil"><i class="icon-user"></i> Perfil</a></li>
                     <li><a href="#"><i class="icon-cog"></i> Configuraci&oacute;n</a></li>
                     <li><a href="<?php echo URL; ?>ayuda"><i class="icon-question-sign"></i> Ayuda</a></li>
                     <li class="divider"></li>
