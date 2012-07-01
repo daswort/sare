@@ -3,7 +3,6 @@
   <button type="button" class="close" data-dismiss="alert">x</button>
   <span>&iexcl;<strong>Alumno</strong> creado!</span>
 </div>
-<div id="cont-msg"><div id="mensaje"></div></div>
 <form id="fusuarios" method="post" action="<?php echo URL; ?>usuario/paCrearUsuario">
   <div style="float: left;">
     <label>RUT</label><input class="inputusuario" type="text" name="rut"  autofocus="autofocus" required="required" /><br />

@@ -74,7 +74,9 @@ $(function () {
                 	var codEst = o[0].CODIGO;
                 	$.get('establecimiento/ajaxListaEstablecimientos', function (a){
                 		for (var i = 0; i < a.length; i++) {
-                			if(a[i].CODIGO == codEst){
+                			if(a[i].CODIGO != codEst){
+                				$('#estab-adm').append('<option value="' + a[i].CODIGO + '">' + a[i].NOMBRE + '</option>');
+                			} else {
                 				$('#estab-adm').append('<option selected="selected" value="' + a[i].CODIGO + '">' + a[i].NOMBRE + '</option>');
                 			}
                 		}

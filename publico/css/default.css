@@ -81,13 +81,8 @@ body {
   display:none
 }
 
-#cont-fusuarios h3 {
-	padding:20px 0 0 0;
-	text-align: center;
-}
-
-#cont-listausuarios h3 {
-	padding:20px 0 20px 0;
+.seccion h3 {
+	padding:20px 0 30px 0;
 	text-align: center;
 }
 

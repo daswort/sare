@@ -121,4 +121,9 @@ class Establecimiento extends Controlador {
 	
 		require 'vistas/establecimiento/_listaEstab.php';
 	}
+	
+	public function muestraEditar() {
+	
+		require 'vistas/establecimiento/_editaEstab.php';
+	}
 }

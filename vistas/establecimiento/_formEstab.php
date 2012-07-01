@@ -1,3 +1,4 @@
+<h3>Crear Establecimiento</h3>
 <div id="alerta-creacion" class="alert alert-success fade in hide">
   <button type="button" class="close" data-dismiss="alert">x</button>
   <span>&iexcl;<strong>Establecimiento</strong> creado!</span>

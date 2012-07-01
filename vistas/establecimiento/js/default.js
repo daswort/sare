@@ -86,17 +86,109 @@ $(function () {
     	$('.lista-est').remove();
         $('#cont-festablecimientos').fadeOut("slow");
         $('#cont-listaestablecimientos').fadeIn("slow");
+        $.get('establecimiento/muestraEditar', function (o){
+        	$('#cont-editar').html(o);
+		});
         $.get('establecimiento/muestraLista', function (o){
         	$('#cont-listaestablecimientos').html(o);
         	$.get('establecimiento/ajaxListaEstablecimientos', function (o) {
         		for (var i = 0; i < o.length; i++) {
-    				$('#tabla-listaestablecimientos').append('<tr id="fila-' + o[i].CODIGO + '" class="lista-est">' + '<td>' + o[i].CODIGO + '</td>' + '<td>' + o[i].NOMBRE + '</td>' + '<td>' + o[i].DIRECCION + '</td>' + '<td>' + o[i].NOMBRE_COMUNA + '</td>' + '<td>' + o[i].NOMBRE_PROVINCIA + '</td>' + '<td>' + o[i].NOMBRE_REGION + '</td>' + '<td><a href="#" class="editar" name="modal" rel="' + o[i].CODIGO + '">Editar</a></td>' + '<td><a href="#" class="del" rel="' + o[i].CODIGO + '">Eliminar</a></td>' + '</tr>');
+    				$('#tabla-listaestablecimientos').append('<tr id="fila-' + o[i].CODIGO + '" class="lista-est">' + '<td>' + o[i].CODIGO + '</td>' + '<td>' + o[i].NOMBRE + '</td>' + '<td>' + o[i].DIRECCION + '</td>' + '<td>' + o[i].NOMBRE_COMUNA + '</td>' + '<td>' + o[i].NOMBRE_PROVINCIA + '</td>' + '<td>' + o[i].NOMBRE_REGION + '</td>' + '<td><a href="#" class="editar" name="modal" rel="' + o[i].CODIGO + '">Editar</a></td>' + '<td><a href="#" name="' + o[i].NOMBRE + '" class="del" rel="' + o[i].CODIGO + '">Eliminar</a></td>' + '</tr>');
     			}
         		$('.editar').click(function () {
+        			$('#region-est option').remove();
+        			$('#provincia-est option').remove();
+        			$('#comuna-est option').remove();
         			var id = $(this).attr('rel');
         			$.post('establecimiento/ajaxListaUnEstablecimiento', { 'codigo': id }, function (o) {
-        				
-        			});
+        				$('.codigo-est').attr('value', o[0].CODIGO);
+                    	$('#nombre-est').attr('value', o[0].NOMBRE);
+                    	$('#direccion-est').attr('value', o[0].DIRECCION);
+                    	var idReg = o[0].ID_REGION;
+                    	$.get('establecimiento/selectRegiones', function (a){
+                    		for (var i = 0; i < a.length; i++) {
+                    			if (a[i].ID != idReg) {
+                    				$('#region-est').append('<option value="' + a[i].ID + '">' + a[i].NOMBRE_REGION + '</option>');
+                    			} else {
+                    				$('#region-est').append('<option selected="selected" value="' + a[i].ID + '">' + a[i].NOMBRE_REGION + '</option>');
+                    			}
+                    		}
+                    	}, 'json');
+                    	var idProv = o[0].ID_PROVINCIA;
+                    	$.get('establecimiento/selectProvincias', { 'id': idReg }, function (a){
+                    		for (var i = 0; i < a.length; i++) {
+                    			if (a[i].ID != idProv) {
+                    				$('#provincia-est').append('<option value="' + a[i].ID + '">' + a[i].NOMBRE_PROVINCIA + '</option>');
+                    			} else {
+                    				$('#provincia-est').append('<option selected="selected" value="' + a[i].ID + '">' + a[i].NOMBRE_PROVINCIA + '</option>');
+                    			}
+                    		}
+                    	}, 'json');
+                    	var idCom = o[0].ID_COMUNA;
+                    	$.get('establecimiento/selectComunas', { 'id': idProv }, function (a){
+                    		for (var i = 0; i < a.length; i++) {
+                    			if (a[i].ID != idCom) {
+                    				$('#comuna-est').append('<option value="' + a[i].ID + '">' + a[i].NOMBRE_COMUNA + '</option>');
+                    			} else {
+                    				$('#comuna-est').append('<option selected="selected" value="' + a[i].ID + '">' + a[i].NOMBRE_COMUNA + '</option>');
+                    			}
+                    		}
+                    	}, 'json');
+                    	$('#modal-editar').modal();
+        			}, 'json');
+        		});
+        		$('#region-est').change(function (){
+            		var idReg = $('#region-est').val();
+        			$('#provincia-est option').remove();
+            		$.get('establecimiento/selectProvincias', { 'id': idReg }, function (o){
+            			for (var i = 0; i < o.length; i++) {
+            				$('#provincia-est').append('<option value="' + o[i].ID + '">' + o[i].NOMBRE_PROVINCIA + '</option>');
+            			}
+            		}, 'json');
+            	});
+        		$('#provincia-est').change(function (){
+        			var idProv = $('#provincia-est').val();
+        			$('#comuna-est option').remove();
+            		$.get('establecimiento/selectComunas', { 'id': idProv }, function (o){
+            			for (var i = 0; i < o.length; i++) {
+            				$('#comuna-est').append('<option value="' + o[i].ID + '">' + o[i].NOMBRE_COMUNA + '</option>');
+            			}
+            		}, 'json');
+        		});
+        		$('#form-editar-establecimiento').live('submit', function () {
+                    var url = $(this).attr('action');
+                    var data = $(this).serialize();
+                    $.post(url, data, function (o) {
+                    	/**:P**/
+                    }, 'json');
+                    $('.inputusuario').val("");
+                    $("#alerta-editar-est").animate({ 'height':'toggle','opacity':'toggle'});
+                    window.setTimeout( function(){
+                        $("#alerta-editar-est").slideUp();
+                    }, 2500);
+                    $('#modal-editar').modal('hide');
+                    return false;
+                });
+        		$('.del').live('click', function () {
+            		var id = $(this).attr('rel');
+            		$('#establecimiento-eliminar strong').remove();
+            		var nombre = $(this).attr('name');
+    				$('#establecimiento-eliminar').append('<strong>' + nombre + '</strong>');
+    				$('#eliminar').attr('rel', id);
+            		$('#modal-eliminar').modal();
+    			});
+            	$('#eliminar').click( function () {
+            		var id = $(this).attr('rel');
+            		var delItem = $('#fila-' + id);
+    				$.post('establecimiento/ajaxDeshabilitar', {
+    					'codigo': id
+    				}, function (o) {
+    					delItem.remove();
+    				}, 'json');
+    				$("#alerta-eliminar-est").animate({ 'height':'toggle','opacity':'toggle'});
+                    window.setTimeout( function(){
+                        $("#alerta-eliminar-est").slideUp();
+                    }, 2500);
         		});
     		}, 'json');
         });

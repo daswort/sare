@@ -103,7 +103,6 @@ class Establecimiento_Modelo extends Modelo {
 	public function ajaxDeshabilitar() {
 	
 		$postData = array('ESTADO' => 0);
-		//print_r($postData);
 		$this->bd->update('SARE_ESTABLECIMIENTOS', $postData, "CODIGO = {$_POST['codigo']}");
 	
 	}

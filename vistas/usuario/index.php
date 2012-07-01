@@ -34,8 +34,8 @@
   </div>
   </div>
   
-  <div id="cont-fusuarios" class="cont-form"></div>
-  <div id="cont-listausuarios" style="display:none"></div>
+  <div id="cont-fusuarios" class="cont-form seccion"></div>
+  <div id="cont-listausuarios" class="seccion" style="display:none"></div>
   <div id="cont-editar"></div>
   
   <div class="modal hide fade" id="modal-eliminar">

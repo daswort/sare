@@ -69,13 +69,11 @@ $(function () {
     });
 
     $('#listar').click(function () {
-		
     	$('.lista-est').remove();
         $('#cont-festablecimientos').fadeOut("slow");
         $('#cont-listaestablecimientos').fadeIn("slow");
-		
+       
 		$.get('establecimiento/ajaxListaEstablecimientos', function (o) {
-
 			for (var i = 0; i < o.length; i++) {
 				$('#tabla-listaestablecimientos').append('<tr id="fila-' + o[i].CODIGO + '" class="lista-est">' + '<td>' + o[i].CODIGO + '</td>' + '<td>' + o[i].NOMBRE + '</td>' + '<td>' + o[i].DIRECCION + '</td>' + '<td>' + o[i].NOMBRE_COMUNA + '</td>' + '<td>' + o[i].NOMBRE_PROVINCIA + '</td>' + '<td>' + o[i].NOMBRE_REGION + '</td>' + '<td><a href="#" class="editar" name="modal" rel="' + o[i].CODIGO + '">Editar</a></td>' + '<td><a href="#" class="del" rel="' + o[i].CODIGO + '">Eliminar</a></td>' + '</tr>');
 			}
