@@ -16,5 +16,4 @@ class Vista {
 			require 'vistas/footer.php';	
 		}
 	}
-
 }

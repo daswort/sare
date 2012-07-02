@@ -8,8 +8,8 @@
     <meta name="author" content="" />
 
     <link rel="stylesheet" media="all" href="<?php echo URL; ?>publico/css/bootstrap.css" />	
-	<link rel="stylesheet" media="all" href="<?php echo URL; ?>publico/css/jquery-ui.css" />
 	<link rel="stylesheet" media="all" href="<?php echo URL; ?>publico/css/default.css" />
+	<link rel="shortcut icon" href="<?php echo URL; ?>publico/img/favicon.png" type="image/png" />
     <style type="text/css"> body { padding-top: 60px; padding-bottom: 40px; }</style>
     <link href="<?php echo URL; ?>publico/css/bootstrap-responsive.css" rel="stylesheet" />
     <!--[if lt IE 9]>

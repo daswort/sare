@@ -8,7 +8,6 @@
     </section> <!-- /container -->
 
 	<script type="text/javascript" src="<?php echo URL; ?>publico/js/jquery.min.js"></script>
-	<script type="text/javascript" src="<?php echo URL; ?>publico/js/jquery-ui.min.js"></script>
 	<script type="text/javascript" src="<?php echo URL; ?>publico/js/custom.js"></script>
 	<script type="text/javascript" src="<?php echo URL; ?>publico/js/bootstrap.js"></script>
 	<?php

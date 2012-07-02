@@ -6,6 +6,7 @@ $(function () {
     
     $('#agregar-administrativo').click(function () {
         $('#cont-listausuarios').fadeOut("slow");
+        $('#cont-buscar').fadeOut("slow");
         $('#cont-fusuarios').fadeIn("slow");
         $.get('usuario/muestraForm', { 'id': 2 }, function (o){
         	$('#cont-fusuarios').html(o);
@@ -19,6 +20,7 @@ $(function () {
     
     $('#agregar-profesor').click(function () {
         $('#cont-listausuarios').fadeOut("slow");
+        $('#cont-buscar').fadeOut("slow");
         $('#cont-fusuarios').fadeIn("slow");
         $.get('usuario/muestraForm', { 'id': 3 }, function (o){
         	$('#cont-fusuarios').html(o);
@@ -27,6 +29,7 @@ $(function () {
     
     $('#agregar-alumno').click(function () {
         $('#cont-listausuarios').fadeOut("slow");
+        $('#cont-buscar').fadeOut("slow");
         $('#cont-fusuarios').fadeIn("slow");
         $.get('usuario/muestraForm', { 'id': 4 }, function (o){
         	$('#cont-fusuarios').html(o);
@@ -48,6 +51,7 @@ $(function () {
     
     $('#listar-administrativo').click(function () {
     	$('#cont-fusuarios').fadeOut("slow");
+    	$('#cont-buscar').fadeOut("slow");
     	$('#cont-listausuarios').fadeIn("slow");
     	$.get('usuario/muestraEditar', { 'id': 2 }, function (o){
         	$('#cont-editar').html(o);
@@ -128,6 +132,7 @@ $(function () {
     });
     
     $('#listar-profesor').click(function () {
+    	$('#cont-buscar').fadeOut("slow");
     	$('#cont-fusuarios').fadeOut("slow");
     	$('#cont-listausuarios').fadeIn("slow");
     	$.get('usuario/muestraEditar', { 'id': 3 }, function (o){
@@ -206,6 +211,7 @@ $(function () {
     
     $('#listar-alumno').click(function () {
     	$('#cont-fusuarios').fadeOut("slow");
+    	$('#cont-buscar').fadeOut("slow");
     	$('#cont-listausuarios').fadeIn("slow");
     	$.get('usuario/muestraEditar', { 'id': 4 }, function (o){
         	$('#cont-editar').html(o);
@@ -282,6 +288,36 @@ $(function () {
             }, 2500);
         }, 'json');
         $('.inputusuario').val("");
+        return false;
+    });
+
+    $('.buscar').click(function() {
+    	$('#cont-fusuarios').fadeOut("slow");
+    	$('#cont-listausuarios').fadeOut("slow");
+    	$('#cont-buscar').fadeIn("slow");
+    	var id = $(this).attr('id');
+    	$.get('usuario/muestraBuscar', { 'listar': id }, function (o){
+        	$('#cont-buscar').html(o);
+        });
+    });
+    $('#form-buscar-usuario').live('submit', function () {
+    	$('#cont-resultado-ninguno p').fadeOut("slow");
+        var url = $(this).attr('action');
+        var data = $(this).serialize();
+        $.post(url, data, function (o) {
+        	if (o == null){
+        		$('#cont-resultado-busqueda').attr('style', 'display:none');
+        		$('#cont-resultado-ninguno').append('<p>No se encontr&oacute; ning&uacute;n resultado </p>');
+        		$('#cont-resultado-ninguno').fadeIn("slow");
+        		return false;
+        	}
+        	$('#cont-resultado-busqueda').fadeIn("slow");
+        	$('#cont-resultado-busqueda tr:nth-child(n+2)').remove();
+        	for (var i = 0; i < o.length; i++) {
+        		$('#tabla-resultado-busqueda').append('<tr id="fila-' + i + '" class="lista-usu"><td>' + o[i].RUT + '</td><td>' + o[i].NOMBRES + '</td><td>' + o[i].APATERNO + '</td><td>' + o[i].AMATERNO + '</td><td>' + o[i].USERNAME + '</td><td>' + o[i].EMAIL + '</td><td>' + o[i].PERMISO + '</td></tr>');
+        	}
+        }, 'json');
+        $('#buscador-usuario').val("");
         return false;
     });
 });

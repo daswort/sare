@@ -115,6 +115,131 @@ class Usuario_Modelo extends Modelo {
 		}
 	}
 	
+	public function buscarUsuario() {
+		
+		switch ($_POST['tipo']) {
+			case "por-rut":
+				$dato = $_POST['rut'];
+				$resultado = $this->bd->select("SELECT rut, nombres, apaterno, amaterno, username, email, permiso
+												FROM sare_usuarios
+												WHERE estado = 1 AND rut = '$dato'");
+				if ($resultado == null) {
+					$resultado = null;
+					echo json_encode($resultado);		
+				} elseif($resultado != null) {
+					switch ($resultado[0]["PERMISO"]){
+						case 1:
+							$resultado[0]["PERMISO"] = "Superusuario";
+						break;
+						case 2:
+							$resultado[0]["PERMISO"] = "Administrativo";
+						break;
+						case 3:
+							$resultado[0]["PERMISO"] = "Profesor";
+						break;
+						case 4:
+							$resultado[0]["PERMISO"] = "Alumno";
+						break;
+					}
+					echo json_encode($resultado);
+				}
+			break;
+			
+			case "por-nom":
+				$dato = $_POST['nombre'];
+				$resultado = $this->bd->select("SELECT rut, nombres, apaterno, amaterno, username, email, permiso
+												FROM sare_usuarios
+												WHERE estado = 1 AND nombres LIKE '$dato %' OR nombres LIKE '% $dato'");
+				if ($resultado == null) {
+					$resultado = null;
+					echo json_encode($resultado);
+				} elseif($resultado != null) {
+					//print_r($resultado);
+					$c = count($resultado);
+					for ($i = 0; $i < $c; $i++){
+						switch ($resultado[$i]['PERMISO']){
+							case 1:
+								$resultado[$i]["PERMISO"] = "Superusuario";
+							break;
+							case 2:
+								$resultado[$i]["PERMISO"] = "Administrativo";
+							break;
+							case 3:
+								$resultado[$i]["PERMISO"] = "Profesor";
+							break;
+							case 4:
+								$resultado[$i]["PERMISO"] = "Alumno";
+							break;
+						}
+					}
+					echo json_encode($resultado);
+				}
+			break;
+			
+			case "por-ap":
+				$dato = $_POST['apaterno'];
+				$resultado = $this->bd->select("SELECT rut, nombres, apaterno, amaterno, username, email, permiso
+												FROM sare_usuarios
+												WHERE estado = 1 AND apaterno = '$dato'");
+				if ($resultado == null) {
+					$resultado = null;
+					echo json_encode($resultado);
+				} elseif($resultado != null) {
+					//print_r($resultado);
+					$c = count($resultado);
+					for ($i = 0; $i < $c; $i++){
+						switch ($resultado[$i]['PERMISO']){
+							case 1:
+								$resultado[$i]["PERMISO"] = "Superusuario";
+								break;
+							case 2:
+								$resultado[$i]["PERMISO"] = "Administrativo";
+								break;
+							case 3:
+								$resultado[$i]["PERMISO"] = "Profesor";
+								break;
+							case 4:
+								$resultado[$i]["PERMISO"] = "Alumno";
+								break;
+						}
+					}
+					echo json_encode($resultado);
+				}
+			break;
+			
+			case "por-am":
+				$dato = $_POST['amaterno'];
+				$resultado = $this->bd->select("SELECT rut, nombres, apaterno, amaterno, username, email, permiso
+												FROM sare_usuarios
+												WHERE estado = 1 AND amaterno = '$dato'");
+				if ($resultado == null) {
+					$resultado = null;
+					echo json_encode($resultado);
+				} elseif($resultado != null) {
+					//print_r($resultado);
+					$c = count($resultado);
+					for ($i = 0; $i < $c; $i++){
+						switch ($resultado[$i]['PERMISO']){
+							case 1:
+								$resultado[$i]["PERMISO"] = "Superusuario";
+								break;
+							case 2:
+								$resultado[$i]["PERMISO"] = "Administrativo";
+								break;
+							case 3:
+								$resultado[$i]["PERMISO"] = "Profesor";
+								break;
+							case 4:
+								$resultado[$i]["PERMISO"] = "Alumno";
+								break;
+						}
+					}
+					echo json_encode($resultado);
+				}
+			break;
+		}
+	}
+	
 	public function ajaxCrear() {
 		
 		switch ($_POST['permiso']) {

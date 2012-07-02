@@ -102,6 +102,11 @@ class Usuario extends Controlador {
 		$this->modelo->ajaxListaUnUsuario();
 	}
 	
+	function buscarUsuario() {
+		
+		$this->modelo->buscarUsuario();
+	}
+	
 	public function ajaxCrear() {
 		
 		$this->modelo->ajaxCrear();
@@ -173,6 +178,28 @@ class Usuario extends Controlador {
 			break;
 			case 4:
 				require 'vistas/usuario/_editaAlum.php';
+			break;
+		}
+	}
+	
+	function muestraBuscar() {
+		
+		switch ($_GET['listar']) {
+			case "por-rut":
+				$this->vista->formBuscar = array('Rut','encuentra-rut','number','por-rut','rut');
+				$this->vista->mostrar('usuario/_buscaUsuario', true);
+			break;
+			case "por-nom":
+				$this->vista->formBuscar = array('Nombre','encuentra-nom','text','por-nom','nombre');
+				$this->vista->mostrar('usuario/_buscaUsuario', true);
+			break;
+			case "por-ap":
+				$this->vista->formBuscar = array('Apellido Paterno','encuentra-ap','text','por-ap','apaterno');
+				$this->vista->mostrar('usuario/_buscaUsuario', true);
+			break;
+			case "por-am":
+				$this->vista->formBuscar = array('Apellido Materno','encuentra-am','text','por-am','amaterno');
+				$this->vista->mostrar('usuario/_buscaUsuario', true);
 			break;
 		}
 	}
