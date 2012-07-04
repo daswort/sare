@@ -68,21 +68,21 @@ class Usuario_Modelo extends Modelo {
 			case "adm":
 				$resultado = $this->bd->select("SELECT su.rut, su.nombres, su.apaterno, su.amaterno, su.username, su.email, sa.cargo, se.nombre
 												FROM sare_usuarios su, sare_administrativos sa, sare_establecimientos se
-												WHERE su.rut = sa.rut AND se.codigo = sa.codigo_estab AND su.estado = 1");
+												WHERE su.rut = sa.rut_adm AND se.codigo = sa.codigo_estab AND su.estado = 1");
 				echo json_encode($resultado);
 			break;
 			
 			case "prof":
 				$resultado = $this->bd->select("SELECT su.rut, su.nombres, su.apaterno, su.amaterno, su.username, su.email, sp.telefono
 												FROM sare_usuarios su, sare_profesores sp
-												WHERE su.rut = sp.rut AND su.estado = 1");
+												WHERE su.rut = sp.rut_prof AND su.estado = 1");
 				echo json_encode($resultado);
 			break;
 			
 			case "alum":
 				$resultado = $this->bd->select("SELECT su.rut, su.nombres, su.apaterno, su.amaterno, su.username, su.email, sa.sexo, sa.direccion
 												FROM sare_usuarios su, sare_alumnos sa
-												WHERE su.rut = sa.rut AND su.estado = 1");
+												WHERE su.rut = sa.rut_alum AND su.estado = 1");
 				echo json_encode($resultado);
 			break;
 		}
@@ -96,20 +96,20 @@ class Usuario_Modelo extends Modelo {
 			case "adm":
 				$resultado = $this->bd->select("SELECT su.rut, su.nombres, su.apaterno, su.amaterno, su.username, su.email, su.passwd, sa.cargo, se.codigo, se.nombre
 												FROM sare_usuarios su, sare_administrativos sa, sare_establecimientos se
-												WHERE su.rut = sa.rut AND se.codigo = sa.codigo_estab AND su.estado = 1 AND su.rut = '$id'");
+												WHERE su.rut = sa.rut_adm AND se.codigo = sa.codigo_estab AND su.estado = 1 AND su.rut = '$id'");
 				echo json_encode($resultado);
 			break;
 			case "prof":
 				$resultado = $this->bd->select("SELECT su.rut, su.nombres, su.apaterno, su.amaterno, su.username, su.email, su.passwd, sp.telefono
 												FROM sare_usuarios su, sare_profesores sp
-												WHERE su.rut = sp.rut AND su.estado = 1 AND su.rut = '$id'");
+												WHERE su.rut = sp.rut_prof AND su.estado = 1 AND su.rut = '$id'");
 				echo json_encode($resultado);				
 			break;
 			
 			case "alum":
 				$resultado = $this->bd->select("SELECT su.rut, su.nombres, su.apaterno, su.amaterno, su.username, su.email, su.passwd, sa.sexo, sa.direccion
 												FROM sare_usuarios su, sare_alumnos sa
-												WHERE su.rut = sa.rut AND su.estado = 1 AND su.rut = '$id'");
+												WHERE su.rut = sa.rut_alum AND su.estado = 1 AND su.rut = '$id'");
 				echo json_encode($resultado);
 			break;
 		}

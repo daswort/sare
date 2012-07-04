@@ -37,12 +37,14 @@
 			    <?php if (Sesion::get('rol') == 1): ?>
 				  <li <?php echo($_GET['url'] == 'establecimiento' ? 'class="active"' : ''); ?>><a href="<?php echo URL; ?>establecimiento"><i class="icon-bell icon-white"></i> Establecimientos</a></li>
 				  <li <?php echo($_GET['url'] == 'usuario' ? 'class="active"' : ''); ?>><a href="<?php echo URL; ?>usuario"><i class="icon-user icon-white"></i> Usuarios</a></li>
+				  <li <?php echo($_GET['url'] == 'matricula' ? 'class="active"' : ''); ?>><a href="<?php echo URL; ?>matricula"><i class="icon-certificate icon-white"></i> Matricula</a></li>
 				  <li <?php echo($_GET['url'] == 'feedback' ? 'class="active"' : ''); ?>><a href="<?php echo URL; ?>feedback"><i class="icon-refresh icon-white"></i> Feedback</a></li>
 				  <li <?php echo($_GET['url'] == 'reporte' ?  'class="active"' : ''); ?>><a href="<?php echo URL; ?>reporte"><i class="icon-list-alt icon-white"></i> Reportes</a></li>
 				<?php endif; ?>
 				<?php if (Sesion::get('rol') == 2): ?>
 				  <li <?php echo($_GET['url'] == 'establecimiento' ? 'class="active"' : ''); ?>><a href="<?php echo URL; ?>establecimiento"><i class="icon-bell icon-white"></i> Establecimientos</a></li>
 				  <li <?php echo($_GET['url'] == 'usuario' ? 'class="active"' : ''); ?>><a href="<?php echo URL; ?>usuario"><i class="icon-user icon-white"></i> Usuarios</a></li>
+				  <li <?php echo($_GET['url'] == 'matricula' ? 'class="active"' : ''); ?>><a href="<?php echo URL; ?>matricula"><i class="icon-certificate icon-white"></i> Matricula</a></li>
 				<?php endif; ?>
 				<?php if (Sesion::get('rol') == 3): ?>
 				<?php endif; ?>

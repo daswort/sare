@@ -53,29 +53,89 @@ CREATE TABLE sare_usuarios(
 	CONSTRAINT sare_usuarios_ck_estado CHECK (estado IN (0, 1))
 );
 
-CREATE TABLE sare_alumnos(
-	rut number(8),
-	sexo char(1),
-	direccion varchar2(200),
-	CONSTRAINT alumnos_pk PRIMARY KEY (rut),
-	CONSTRAINT alumnos_fk_usuarios FOREIGN KEY (rut) REFERENCES sare_usuarios,
-	CONSTRAINT alumnos_ck_sexo CHECK (sexo in ('m', 'f'))
-);
-
 CREATE TABLE sare_administrativos(
-	rut number(8),
+	rut_adm number(8),
 	cargo varchar2(200),
 	codigo_estab number(4),
-	CONSTRAINT administrativos_pk PRIMARY KEY (rut),
-	CONSTRAINT administrativos_fk_usuarios FOREIGN KEY (rut) REFERENCES sare_usuarios,
+	CONSTRAINT administrativos_pk PRIMARY KEY (rut_adm),
+	CONSTRAINT administrativos_fk_usuarios FOREIGN KEY (rut_adm) REFERENCES sare_usuarios,
 	CONSTRAINT administrativos_fk_estab FOREIGN KEY (codigo_estab) REFERENCES sare_establecimientos
 );
 
 CREATE TABLE sare_profesores(
-	rut number(8),
+	rut_prof number(8),
 	telefono number(8),
-	CONSTRAINT profesores_pk PRIMARY KEY (rut),
-	CONSTRAINT profesores_fk_usuarios FOREIGN KEY (rut) REFERENCES sare_usuarios
+	CONSTRAINT profesores_pk PRIMARY KEY (rut_prof),
+	CONSTRAINT profesores_fk_usuarios FOREIGN KEY (rut_prof) REFERENCES sare_usuarios
+);
+
+CREATE TABLE sare_alumnos(
+	rut_alum number(8),
+	sexo char(1),
+	direccion varchar2(200),
+	CONSTRAINT alumnos_pk PRIMARY KEY (rut_alum),
+	CONSTRAINT alumnos_fk_usuarios FOREIGN KEY (rut_alum) REFERENCES sare_usuarios,
+	CONSTRAINT alumnos_ck_sexo CHECK (sexo in ('m', 'f'))
+);
+
+CREATE TABLE sare_cursos(
+	grado number(1),
+	letra char(1),
+	nivel char(1),
+	CONSTRAINT cursos_pk PRIMARY KEY (grado, letra, nivel),
+	CONSTRAINT cursos_ck_grado CHECK (grado >= 0),
+	CONSTRAINT cursos_ck_nivel CHECK (nivel IN ('b', 'm'))
+);
+
+CREATE TABLE sare_matriculas(
+	profe_jefe number(8),
+	codigo_estab number(4),
+	grado_curso number(1),
+	letra_curso char(1),
+	nivel_curso char(1),
+	anio_matricula number(4),
+	rut_alum number(8),
+	CONSTRAINT matriculas_pk PRIMARY KEY (profe_jefe, codigo_estab, grado_curso, letra_curso, nivel_curso, anio_matricula),
+	CONSTRAINT matriculas_fk_establecimientos FOREIGN KEY (codigo_estab) REFERENCES sare_establecimientos,
+	CONSTRAINT matriculas_fk_cursos FOREIGN KEY (grado_curso, letra_curso, nivel_curso) REFERENCES sare_cursos,
+	CONSTRAINT matriculas_fk_profesores FOREIGN KEY (profe_jefe) REFERENCES sare_profesores,
+	CONSTRAINT matriculas_fk_alumnos FOREIGN KEY (rut_alum) REFERENCES sare_alumnos
+);
+
+CREATE TABLE sare_asignaturas(
+  codigo varchar2(5),
+  nombre varchar2(200) NOT NULL,
+  CONSTRAINT asignaturas_pk PRIMARY KEY (codigo)
+);
+
+CREATE TABLE sare_unidades(
+  codigo_asig varchar2(5),
+  codigo_unid number(2),
+  nombre varchar2(200) NOT NULL,
+  CONSTRAINT unidades_pk PRIMARY KEY (codigo_asig, codigo_unid),
+  CONSTRAINT unidades_fk_asig FOREIGN KEY (codigo_asig) REFERENCES sare_asignaturas
+);
+
+CREATE TABLE sare_clases(
+  rut_prof number(8),
+  codigo_asig varchar2(5),
+  codigo_unid number(2),
+  anio_clase number(4) NOT NULL,
+  CONSTRAINT clases_pk PRIMARY KEY (rut_prof, codigo_asig, codigo_unid),
+  CONSTRAINT clases_fk_prof FOREIGN KEY (rut_prof) REFERENCES sare_profesores,
+  CONSTRAINT clases_fk_unid FOREIGN KEY (codigo_asig, codigo_unid) REFERENCES sare_unidades
+);
+
+CREATE TABLE sare_evaluaciones(
+  rut_alum number(8),
+  rut_prof number(8),
+  codigo_asig varchar2(5),
+  codigo_unid number(2),
+  fecha_eval date NOT NULL,
+  puntaje_unid number(3) NOT NULL,
+  CONSTRAINTS eval_pk PRIMARY KEY (rut_alum, rut_prof, codigo_asig, codigo_unid),
+  CONSTRAINTS eval_fk_alum FOREIGN KEY (rut_alum) REFERENCES sare_alumnos,
+  CONSTRAINTS eval_fk_clas FOREIGN KEY (rut_prof, codigo_asig, codigo_unid) REFERENCES sare_clases
 );
 
 -- PROCEDIMIENTOS ALMACENADOS --
@@ -318,7 +378,7 @@ END sp_usuario_alumno_update ;
 
 
 
--- D A T O S   R E G I O N E S
+-- I N S E R T   R E G I O N E S
 
 INSERT INTO sare_regiones VALUES(1,'I','Tarapacá','Iquique');
 INSERT INTO sare_regiones VALUES(2,'II','Antofagasta','Antofagasta');
@@ -336,7 +396,7 @@ INSERT INTO sare_regiones VALUES(13,'RM','Región Metropolitana de Santiago','San
 INSERT INTO sare_regiones VALUES(14,'XIV','De los Ríos','Valdivia');
 INSERT INTO sare_regiones VALUES(15,'XV','Arica Parinacota','Arica');
 
--- D A T O S   P R O V I N C I A S
+-- I N S E R T   P R O V I N C I A S
 
 INSERT INTO sare_provincias (id_region,id,nombre_provincia,capital_provincia) VALUES(1,1,'Iquique','Iquique');
 INSERT INTO sare_provincias (id_region,id,nombre_provincia,capital_provincia) VALUES(1,53,'Tamarugal','Pozo Almonte');
@@ -392,7 +452,7 @@ INSERT INTO sare_provincias (id_region,id,nombre_provincia,capital_provincia) VA
 INSERT INTO sare_provincias (id_region,id,nombre_provincia,capital_provincia) VALUES(15,2,'Arica','Arica');
 INSERT INTO sare_provincias (id_region,id,nombre_provincia,capital_provincia) VALUES(15,3,'Parinacota','Putre');
 
---D A T O S   C O M U N A S
+-- I N S E R T   C O M U N A S
 
 INSERT INTO sare_comunas(id_region,id_provincia,id,nombre_comuna) VALUES(1,1,1,'Alto Hospicio');
 INSERT INTO sare_comunas(id_region,id_provincia,id,nombre_comuna) VALUES(1,1,2,'Iquique');
@@ -740,3 +800,368 @@ INSERT INTO sare_comunas(id_region,id_provincia,id,nombre_comuna) VALUES(15,2,8,
 INSERT INTO sare_comunas(id_region,id_provincia,id,nombre_comuna) VALUES(15,2,9,'Camarones');
 INSERT INTO sare_comunas(id_region,id_provincia,id,nombre_comuna) VALUES(15,3,10,'General Lagos');
 INSERT INTO sare_comunas(id_region,id_provincia,id,nombre_comuna) VALUES(15,3,11,'Putre');
+
+-- I N S E R T   C U R S O S
+
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(1,'a','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(1,'b','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(1,'c','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(1,'d','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(1,'e','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(1,'f','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(1,'g','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(1,'h','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(1,'i','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(1,'j','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(1,'k','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(1,'l','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(1,'m','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(1,'n','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(1,'o','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(1,'p','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(1,'q','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(1,'r','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(1,'s','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(1,'t','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(1,'u','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(1,'v','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(1,'w','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(1,'x','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(1,'y','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(1,'z','b');
+
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(2,'a','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(2,'b','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(2,'c','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(2,'d','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(2,'e','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(2,'f','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(2,'g','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(2,'h','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(2,'i','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(2,'j','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(2,'k','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(2,'l','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(2,'m','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(2,'n','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(2,'o','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(2,'p','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(2,'q','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(2,'r','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(2,'s','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(2,'t','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(2,'u','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(2,'v','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(2,'w','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(2,'x','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(2,'y','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(2,'z','b');
+
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(3,'a','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(3,'b','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(3,'c','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(3,'d','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(3,'e','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(3,'f','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(3,'g','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(3,'h','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(3,'i','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(3,'j','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(3,'k','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(3,'l','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(3,'m','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(3,'n','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(3,'o','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(3,'p','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(3,'q','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(3,'r','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(3,'s','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(3,'t','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(3,'u','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(3,'v','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(3,'w','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(3,'x','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(3,'y','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(3,'z','b');
+
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(4,'a','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(4,'b','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(4,'c','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(4,'d','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(4,'e','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(4,'f','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(4,'g','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(4,'h','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(4,'i','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(4,'j','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(4,'k','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(4,'l','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(4,'m','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(4,'n','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(4,'o','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(4,'p','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(4,'q','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(4,'r','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(4,'s','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(4,'t','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(4,'u','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(4,'v','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(4,'w','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(4,'x','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(4,'y','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(4,'z','b');
+
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(5,'a','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(5,'b','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(5,'c','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(5,'d','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(5,'e','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(5,'f','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(5,'g','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(5,'h','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(5,'i','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(5,'j','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(5,'k','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(5,'l','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(5,'m','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(5,'n','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(5,'o','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(5,'p','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(5,'q','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(5,'r','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(5,'s','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(5,'t','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(5,'u','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(5,'v','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(5,'w','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(5,'x','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(5,'y','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(5,'z','b');
+
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(6,'a','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(6,'b','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(6,'c','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(6,'d','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(6,'e','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(6,'f','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(6,'g','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(6,'h','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(6,'i','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(6,'j','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(6,'k','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(6,'l','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(6,'m','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(6,'n','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(6,'o','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(6,'p','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(6,'q','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(6,'r','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(6,'s','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(6,'t','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(6,'u','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(6,'v','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(6,'w','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(6,'x','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(6,'y','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(6,'z','b');
+
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(7,'a','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(7,'b','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(7,'c','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(7,'d','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(7,'e','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(7,'f','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(7,'g','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(7,'h','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(7,'i','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(7,'j','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(7,'k','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(7,'l','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(7,'m','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(7,'n','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(7,'o','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(7,'p','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(7,'q','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(7,'r','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(7,'s','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(7,'t','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(7,'u','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(7,'v','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(7,'w','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(7,'x','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(7,'y','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(7,'z','b');
+
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(8,'a','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(8,'b','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(8,'c','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(8,'d','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(8,'e','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(8,'f','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(8,'g','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(8,'h','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(8,'i','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(8,'j','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(8,'k','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(8,'l','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(8,'m','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(8,'n','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(8,'o','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(8,'p','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(8,'q','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(8,'r','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(8,'s','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(8,'t','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(8,'u','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(8,'v','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(8,'w','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(8,'x','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(8,'y','b');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(8,'z','b');
+
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(1,'a','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(1,'b','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(1,'c','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(1,'d','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(1,'e','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(1,'f','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(1,'g','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(1,'h','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(1,'i','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(1,'j','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(1,'k','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(1,'l','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(1,'m','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(1,'n','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(1,'o','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(1,'p','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(1,'q','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(1,'r','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(1,'s','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(1,'t','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(1,'u','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(1,'v','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(1,'w','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(1,'x','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(1,'y','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(1,'z','m');
+
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(2,'a','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(2,'b','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(2,'c','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(2,'d','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(2,'e','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(2,'f','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(2,'g','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(2,'h','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(2,'i','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(2,'j','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(2,'k','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(2,'l','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(2,'m','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(2,'n','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(2,'o','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(2,'p','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(2,'q','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(2,'r','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(2,'s','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(2,'t','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(2,'u','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(2,'v','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(2,'w','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(2,'x','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(2,'y','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(2,'z','m');
+
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(3,'a','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(3,'b','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(3,'c','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(3,'d','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(3,'e','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(3,'f','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(3,'g','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(3,'h','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(3,'i','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(3,'j','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(3,'k','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(3,'l','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(3,'m','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(3,'n','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(3,'o','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(3,'p','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(3,'q','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(3,'r','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(3,'s','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(3,'t','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(3,'u','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(3,'v','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(3,'w','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(3,'x','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(3,'y','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(3,'z','m');
+
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(4,'a','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(4,'b','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(4,'c','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(4,'d','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(4,'e','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(4,'f','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(4,'g','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(4,'h','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(4,'i','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(4,'j','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(4,'k','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(4,'l','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(4,'m','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(4,'n','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(4,'o','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(4,'p','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(4,'q','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(4,'r','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(4,'s','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(4,'t','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(4,'u','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(4,'v','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(4,'w','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(4,'x','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(4,'y','m');
+INSERT INTO sare_cursos(grado,letra,nivel) VALUES(4,'z','m');
+
+-- I N S E R T   A S I G N A T U R A S
+
+INSERT INTO sare_asignaturas VALUES ('LEN1B', 'Lenguaje 1° Básico');
+INSERT INTO sare_asignaturas VALUES ('LEN2B', 'Lenguaje 2° Básico');
+INSERT INTO sare_asignaturas VALUES ('LEN3B', 'Lenguaje 3° Básico');
+INSERT INTO sare_asignaturas VALUES ('LEN4B', 'Lenguaje 4° Básico');
+INSERT INTO sare_asignaturas VALUES ('LEN5B', 'Lenguaje 5° Básico');
+INSERT INTO sare_asignaturas VALUES ('LEN6B', 'Lenguaje 6° Básico');
+INSERT INTO sare_asignaturas VALUES ('LEN7B', 'Lenguaje 7° Básico');
+INSERT INTO sare_asignaturas VALUES ('LEN8B', 'Lenguaje 8° Básico');
+INSERT INTO sare_asignaturas VALUES ('LEN1M', 'Lenguaje 1° Medio');
+INSERT INTO sare_asignaturas VALUES ('LEN2M', 'Lenguaje 2° Medio');
+INSERT INTO sare_asignaturas VALUES ('LEN3M', 'Lenguaje 3° Medio');
+INSERT INTO sare_asignaturas VALUES ('LEN4M', 'Lenguaje 4° Medio');
+INSERT INTO sare_asignaturas VALUES ('MAT1B', 'Matemáticas 1° Básico');
+INSERT INTO sare_asignaturas VALUES ('MAT2B', 'Matemáticas 2° Básico');
+INSERT INTO sare_asignaturas VALUES ('MAT3B', 'Matemáticas 3° Básico');
+INSERT INTO sare_asignaturas VALUES ('MAT4B', 'Matemáticas 4° Básico');
+INSERT INTO sare_asignaturas VALUES ('MAT5B', 'Matemáticas 5° Básico');
+INSERT INTO sare_asignaturas VALUES ('MAT6B', 'Matemáticas 6° Básico');
+INSERT INTO sare_asignaturas VALUES ('MAT7B', 'Matemáticas 7° Básico');
+INSERT INTO sare_asignaturas VALUES ('MAT8B', 'Matemáticas 8° Básico');
+INSERT INTO sare_asignaturas VALUES ('MAT1M', 'Matemáticas 1° Medio');
+INSERT INTO sare_asignaturas VALUES ('MAT2M', 'Matemáticas 2° Medio');
+INSERT INTO sare_asignaturas VALUES ('MAT3M', 'Matemáticas 3° Medio');
+INSERT INTO sare_asignaturas VALUES ('MAT4M', 'Matemáticas 4° Medio');
+INSERT INTO sare_asignaturas VALUES ('HIS1B', 'Historia 1° Básico');
+INSERT INTO sare_asignaturas VALUES ('HIS2B', 'Historia 2° Básico');
+INSERT INTO sare_asignaturas VALUES ('HIS3B', 'Historia 3° Básico');
+INSERT INTO sare_asignaturas VALUES ('HIS4B', 'Historia 4° Básico');
+INSERT INTO sare_asignaturas VALUES ('HIS5B', 'Historia 5° Básico');
+INSERT INTO sare_asignaturas VALUES ('HIS6B', 'Historia 6° Básico');
+INSERT INTO sare_asignaturas VALUES ('HIS7B', 'Historia 7° Básico');
+INSERT INTO sare_asignaturas VALUES ('HIS8B', 'Historia 8° Básico');
+INSERT INTO sare_asignaturas VALUES ('HIS1M', 'Historia 1° Medio');
+INSERT INTO sare_asignaturas VALUES ('HIS2M', 'Historia 2° Medio');
+INSERT INTO sare_asignaturas VALUES ('HIS3M', 'Historia 3° Medio');
+INSERT INTO sare_asignaturas VALUES ('HIS4M', 'Historia 4° Medio');

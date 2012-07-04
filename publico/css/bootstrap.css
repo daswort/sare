@@ -895,6 +895,11 @@ input[type="file"] {
   /* For IE7, add top margin to align select with labels */
 
   line-height: 28px;
+  
+}
+
+input[type="file"] {
+  width: auto;
 }
 
 select {

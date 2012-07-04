@@ -22,4 +22,19 @@ class Feedback extends Controlador {
 		
 		$this->vista->mostrar('feedback/index');
 	}
+	
+	public function paFeedback() {
+		
+		$this->modelo->paFeedback();
+	}
+	
+	public function selectCursos() {
+		
+		$this->modelo->selectCursos();
+	}
+	
+	public function selectAsignaturas() {
+	
+		$this->modelo->selectAsignaturas();
+	}
 }
