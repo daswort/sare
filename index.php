@@ -4,7 +4,14 @@ require 'config.php';
 
 function __autoload($clase) {
 	
-	require LIBS . $clase .".php";
+	$rutaClase = LIBS . $clase . '.php';
+	$rutaClaseExcel = LIBS . 'PHPExcel/' . $clase . '.php';
+	
+	if(file_exists($rutaClase)) {
+		require $rutaClase;
+	} elseif (file_exists($rutaClaseExcel)) {
+		require $rutaClaseExcel;
+	}
 }
 
 $app = new Bootstrap();
