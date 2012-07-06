@@ -1,4 +1,4 @@
-<div class="hero-unit" style="overflow:hidden;">
+<div class="hero-unit" style="overflow: hidden;">
   <h2>Ayuda</h2>
 
   <br />

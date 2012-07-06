@@ -6,7 +6,7 @@ $(function() {
 	}, 'json');
 	$.get('feedback/selectCursos', { 'nivel': 'm' } , function (o){
 		for (var i = 0; i < o.length; i++){			
-			$('#select-cursos-media').append('<option value="' + o[i].GRADO + '-' + o[i].LETRA + '-' + o[i].NIVEL + '">' + o[i].GRADO + '&#176; Medio ' + o[i].LETRA.toUpperCase() + '</option>');
+			$('#select-cursos-media').append('<option value="' + o[i].GRADO + o[i].LETRA + o[i].NIVEL + '">' + o[i].GRADO + '&#176; Medio ' + o[i].LETRA.toUpperCase() + '</option>');
 		}
 	}, 'json');
 	
@@ -41,4 +41,26 @@ $(function() {
 			}
 		}, 'json');
 	});
+	
+	var bar = $('.bar');
+    var percent = $('.percent');
+    var status = $('#status');
+
+    $('#form-feedback').ajaxForm({
+        beforeSend: function () {
+            status.empty();
+            var percentVal = '0%';
+            bar.width(percentVal)
+            percent.html(percentVal);
+        },
+        uploadProgress: function (event, position, total, percentComplete) {
+            var percentVal = percentComplete + '%';
+            bar.width(percentVal)
+            percent.html(percentVal);
+            //console.log(percentVal, position, total);
+        },
+        complete: function (xhr) {
+            status.html(xhr.responseText);
+        }
+    });
 });

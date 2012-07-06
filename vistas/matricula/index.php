@@ -1,3 +1,1 @@
-<div class="hero-unit">
-HOLAA
-</div>
+<div class="hero-unit">HOLAA</div>
