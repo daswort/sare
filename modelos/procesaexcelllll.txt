@@ -1,0 +1,19 @@
+$j = 0; $i = 0;
+	foreach($datosAlum as $value){
+	  if($value['A'] == 0) continue;
+	  if($rutNoExisten[$j] == $value['A']){   
+		$nom[] = explode(" ", $value['B']);
+		$x = count($nom[$i]);
+		$amaterno[] = $nom[$i][$x-1];
+		$apaterno[] = $nom[$i][$x-2];
+		$primerNom[] = $nom[$i][0];
+		for($p = $x - 2; $p < $x; $p++){
+			unset($nom[$i][$p]);
+        }
+		$nombreCompleto[] = implode(" ", $nom[$i]);
+		$insert[] = "INTO sare_usuarios VALUES('" . $rutNoExisten[$j] . "','" . strtolower($nombreCompleto[$i]) . "','" . strtolower($apaterno[$i]) . "','" . strtolower($amaterno[$i]) . "','4','" . strtolower($primerNom[$i].".".$apaterno[$i].$i) . "','" . Hash::crear('sha256', $rutNoExisten[$j], HASH_PASSWORD_KEY) . "','" . strtolower($nom[$i][0].".".$nom[$i][2].$i) . "@sare.cl','1') ";
+	    $insert[] = "INTO sare_alumnos VALUES('" . $rutNoExisten[$j] . "','','') ";
+		$i++;
+	  }
+	  $j++;
+	}

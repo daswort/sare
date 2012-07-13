@@ -38,48 +38,28 @@ class Feedback extends Controlador {
     $this->modelo->selectAsignaturas();
   }
 
-  public function cargarExcel() {
-
-
+  public function insertMatriculas() {
+	
+	$this->modelo->insertMatriculas();
   }
 
   public function procesarExcel() {
 
-    $fecha = strftime("%d%m%Y%H%M%S", time());
+    //$fecha = strftime("%d%m%Y%H%M%S", time());
     $inputFileName = $_FILES["fichero"]["tmp_name"];
-    $destino = "./archivos/excel" . $fecha . ".xlsx";
+    $destino = "./archivos/excel.xlsx";
     move_uploaded_file($inputFileName,$destino);
-    $inputFileName = "./archivos/excel" . $fecha . ".xlsx";
+    $inputFileName = "./archivos/excel.xlsx";
 
     echo 'Archivo guardado con el nombre: ',pathinfo($inputFileName,PATHINFO_BASENAME),'<br />';
-
 
     $objPHPExcel = PHPExcel_IOFactory::load($inputFileName);
     echo '<hr />';
     echo '-------------------------------- Procesando Archivo --------------------------------------------<br />';
-    $alumnos = $objPHPExcel->getActiveSheet()->toArray(null,true,true,true);
-    $datos = $objPHPExcel->getActiveSheet()->toArray(null,true,true,true);
-    $datos['curso-b'] = $_POST['curso-b'];
-    $datos['curso-m'] = $_POST['curso-m'];
-    $datos['asignatura-b'] = $_POST['asignatura-b'];
-    $datos['asignatura-m'] = $_POST['asignatura-m'];
-    //$datos['fecha-eval'] = $_POST['fecha-eval'];
-    $this->modelo->procesarExcel($datos);
-    $filas = count($alumnos);
-    $columnas = count($alumnos[1]);
-    
-    echo '<table id="tabla-excel" class="table table-striped">';
-    
-    foreach ($alumnos as $key=>$value) {
-      echo '<tr>';
-      foreach($value as $key=>$value){
-        echo '<td>';
-        echo $value;
-        echo '</td>';
-      }
-      echo '</tr>';
-    }
-    
-    echo '</table>';
+    $datosAlum = $objPHPExcel->getActiveSheet()->toArray(null,true,true,true);
+    $datosEval['curso'] = $_POST['curso'];
+    $datosEval['asignatura'] = $_POST['asignatura'];
+    $datosEval['fecha-eval'] = $_POST['fecha-eval'];
+    $this->modelo->procesarExcel($datosEval, $datosAlum);
   }
 }

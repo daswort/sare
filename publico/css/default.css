@@ -81,9 +81,26 @@ body {
   margin: 0 auto 0 auto;
 }
 
+#cont-form-feedback {
+  width: 620px;
+  margin: 0 auto 0 auto;
+}
+
 #cont-fusuarios {
   overflow: hidden;
   display:none
+}
+#cont-menu-reportes {
+  float: left;
+}
+
+#cont-form-reporte {
+  float: left;
+  margin-left: 20px;
+}
+
+#cont-form-reporte select {
+  margin-bottom: 0px;
 }
 
 #form-buscar-usuario ul li {

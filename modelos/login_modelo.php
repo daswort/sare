@@ -9,7 +9,7 @@ class Login_Modelo extends Modelo {
 
   public function logear() {
 
-    $sth = $this->bd->prepare("SELECT PERMISO FROM SARE_USUARIOS WHERE USERNAME = :login AND PASSWD = :password AND ESTADO = 1");
+    $sth = $this->bd->prepare("SELECT RUT, PERMISO FROM SARE_USUARIOS WHERE USERNAME = :login AND PASSWD = :password AND ESTADO = 1");
     $sth->execute(array(':login' => $_POST['login'], ':password' => Hash::crear('sha256', $_POST['password'], HASH_PASSWORD_KEY)));
 
     $datos = $sth->fetch();
@@ -19,6 +19,7 @@ class Login_Modelo extends Modelo {
       Sesion::set('rol', $datos['PERMISO']);
       Sesion::set('logeado', true);
       Sesion::set('usuario', $_POST['login']);
+	  Sesion::set('id', $datos['RUT']);
       header('location: ' . URL . 'inicio');
     } else {
       header('location: ' . URL . 'login');

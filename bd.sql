@@ -95,7 +95,7 @@ CREATE TABLE sare_matriculas(
 	nivel_curso char(1),
 	anio_matricula number(4),
 	rut_alum number(8),
-	CONSTRAINT matriculas_pk PRIMARY KEY (profe_jefe, codigo_estab, grado_curso, letra_curso, nivel_curso, anio_matricula),
+	CONSTRAINT matriculas_pk PRIMARY KEY (profe_jefe, codigo_estab, grado_curso, letra_curso, nivel_curso, anio_matricula, rut_alum),
 	CONSTRAINT matriculas_fk_establecimientos FOREIGN KEY (codigo_estab) REFERENCES sare_establecimientos,
 	CONSTRAINT matriculas_fk_cursos FOREIGN KEY (grado_curso, letra_curso, nivel_curso) REFERENCES sare_cursos,
 	CONSTRAINT matriculas_fk_profesores FOREIGN KEY (profe_jefe) REFERENCES sare_profesores,
@@ -121,9 +121,13 @@ CREATE TABLE sare_clases(
   codigo_asig varchar2(5),
   codigo_unid number(2),
   anio_clase number(4) NOT NULL,
-  CONSTRAINT clases_pk PRIMARY KEY (rut_prof, codigo_asig, codigo_unid),
+  grado_curso number(1),
+  letra_curso char(1),
+  nivel_curso char(1), 
+  CONSTRAINT clases_pk PRIMARY KEY (rut_prof, codigo_asig, codigo_unid, grado_curso, letra_curso, nivel_curso),
   CONSTRAINT clases_fk_prof FOREIGN KEY (rut_prof) REFERENCES sare_profesores,
-  CONSTRAINT clases_fk_unid FOREIGN KEY (codigo_asig, codigo_unid) REFERENCES sare_unidades
+  CONSTRAINT clases_fk_unid FOREIGN KEY (codigo_asig, codigo_unid) REFERENCES sare_unidades,
+  CONSTRAINT clases_fk_cursos FOREIGN KEY (grado_curso, letra_curso, nivel_curso) REFERENCES sare_cursos
 );
 
 CREATE TABLE sare_evaluaciones(
@@ -131,11 +135,14 @@ CREATE TABLE sare_evaluaciones(
   rut_prof number(8),
   codigo_asig varchar2(5),
   codigo_unid number(2),
+  grado_curso number(1),
+  letra_curso char(1),
+  nivel_curso char(1), 
   fecha_eval date NOT NULL,
   puntaje_unid number(3) NOT NULL,
-  CONSTRAINTS eval_pk PRIMARY KEY (rut_alum, rut_prof, codigo_asig, codigo_unid),
+  CONSTRAINTS eval_pk PRIMARY KEY (rut_alum, rut_prof, codigo_asig, codigo_unid, grado_curso, letra_curso, nivel_curso),
   CONSTRAINTS eval_fk_alum FOREIGN KEY (rut_alum) REFERENCES sare_alumnos,
-  CONSTRAINTS eval_fk_clas FOREIGN KEY (rut_prof, codigo_asig, codigo_unid) REFERENCES sare_clases
+  CONSTRAINTS eval_fk_clas FOREIGN KEY (rut_prof, codigo_asig, codigo_unid, grado_curso, letra_curso, nivel_curso) REFERENCES sare_clases
 );
 
 -- PROCEDIMIENTOS ALMACENADOS --
@@ -368,10 +375,10 @@ BEGIN
   
   UPDATE SARE_ALUMNOS
   SET
-    RUT 		= 	p_RUT,
+    RUT_ALUM	= 	p_RUT,
     SEXO 		= 	p_SEXO,
     DIRECCION 	= 	p_DIRECCION
-  WHERE RUT 	= 	p_RUT;
+  WHERE RUT_ALUM = 	p_RUT;
   COMMIT;
   
 END sp_usuario_alumno_update ;
@@ -1165,3 +1172,210 @@ INSERT INTO sare_asignaturas VALUES ('HIS1M', 'Historia 1° Medio');
 INSERT INTO sare_asignaturas VALUES ('HIS2M', 'Historia 2° Medio');
 INSERT INTO sare_asignaturas VALUES ('HIS3M', 'Historia 3° Medio');
 INSERT INTO sare_asignaturas VALUES ('HIS4M', 'Historia 4° Medio');
+
+
+INSERT INTO sare_unidades VALUES ('LEN1B',1, 'Conocimiento de sí mismo e ingreso al mundo de la lectura y escritura');
+INSERT INTO sare_unidades VALUES ('LEN1B',2, 'Comunicación con los demás a través del tiempo y del espacio');
+
+INSERT INTO sare_unidades VALUES ('LEN2B',1, 'El lenguaje como medio para conocer y valorar el entorno');
+INSERT INTO sare_unidades VALUES ('LEN2B',2, 'Manejo de la lengua y conocimientos elementales sobre la misma');
+INSERT INTO sare_unidades VALUES ('LEN2B',3, 'El lenguaje y la vida');
+INSERT INTO sare_unidades VALUES ('LEN2B',4, 'Manejo de la lengua y conocimientos elementales sobre la misma');
+
+INSERT INTO sare_unidades VALUES ('LEN3B',1, 'Comunicación oral');
+INSERT INTO sare_unidades VALUES ('LEN3B',2, 'Lectura');
+INSERT INTO sare_unidades VALUES ('LEN3B',3, 'Escritura');
+INSERT INTO sare_unidades VALUES ('LEN3B',4, 'Manejo de la lengua y conocimientos elementales sobre la misma');
+
+INSERT INTO sare_unidades VALUES ('LEN4B',1, 'Comunicación oral');
+INSERT INTO sare_unidades VALUES ('LEN4B',2, 'Lectura');
+INSERT INTO sare_unidades VALUES ('LEN4B',3, 'Escritura');
+INSERT INTO sare_unidades VALUES ('LEN4B',4, 'Manejo de la lengua y conocimientos elementales sobre la misma');
+
+INSERT INTO sare_unidades VALUES ('LEN5B',1, 'Textos argumentativos');
+INSERT INTO sare_unidades VALUES ('LEN5B',2, 'Textos narrativos literarios');
+INSERT INTO sare_unidades VALUES ('LEN5B',3, 'Textos informativos');
+INSERT INTO sare_unidades VALUES ('LEN5B',4, 'Textos poéticos');
+INSERT INTO sare_unidades VALUES ('LEN5B',5, 'Textos normativos');
+INSERT INTO sare_unidades VALUES ('LEN5B',6, 'Textos dramáticos ');
+INSERT INTO sare_unidades VALUES ('LEN5B',7, 'Textos publicitarios');
+
+INSERT INTO sare_unidades VALUES ('LEN6B',1, 'Comunicación oral');
+INSERT INTO sare_unidades VALUES ('LEN6B',2, 'Comunicación escrita');
+INSERT INTO sare_unidades VALUES ('LEN6B',3, 'Dramatización');
+INSERT INTO sare_unidades VALUES ('LEN6B',4, 'Los medios de comunicación masiva');
+INSERT INTO sare_unidades VALUES ('LEN6B',5, 'Conocimiento del lenguaje');
+
+INSERT INTO sare_unidades VALUES ('LEN7B',1, 'Comunicación oral');
+INSERT INTO sare_unidades VALUES ('LEN7B',2, 'Comunicación escrita');
+INSERT INTO sare_unidades VALUES ('LEN7B',3, 'Dramatización');
+INSERT INTO sare_unidades VALUES ('LEN7B',4, 'Los medios de comunicación masiva');
+INSERT INTO sare_unidades VALUES ('LEN7B',5, 'Conocimiento del lenguaje');
+
+INSERT INTO sare_unidades VALUES ('LEN8B',1, 'Comunicación oral');
+INSERT INTO sare_unidades VALUES ('LEN8B',2, 'Comunicación escrita');
+INSERT INTO sare_unidades VALUES ('LEN8B',3, 'Dramatización');
+INSERT INTO sare_unidades VALUES ('LEN8B',4, 'Los medios de comunicación masiva');
+INSERT INTO sare_unidades VALUES ('LEN8B',5, 'Conocimiento del lenguaje');
+
+/*
+Lenguaje Medio
+*/
+INSERT INTO sare_unidades VALUES ('LEN1M',1, 'La comunicación dialógica');
+INSERT INTO sare_unidades VALUES ('LEN1M',2, 'Comunicación verbal y comunicación no verbal');
+INSERT INTO sare_unidades VALUES ('LEN1M',3, 'Contexto sociocultural de la comunicación');
+
+INSERT INTO sare_unidades VALUES ('LEN2M',1, 'El discurso expositivo como medio de intercambio de informaciones y conocimientos');
+INSERT INTO sare_unidades VALUES ('LEN2M',2, 'La variedad del mundo y de lo humano comunicada por la literatura y los medios de comunicación');
+
+INSERT INTO sare_unidades VALUES ('LEN3M',1, 'La argumentación');
+INSERT INTO sare_unidades VALUES ('LEN3M',2, 'La literatura como fuente de argumentos (modelos y valores) para la vida personal y social');
+
+INSERT INTO sare_unidades VALUES ('LEN4M',1, 'Discursos emitidos en situaciones públicas de enunciación');
+INSERT INTO sare_unidades VALUES ('LEN4M',2, 'Análisis de textos literarios y no literarios referidos a temas contemporáneos');
+
+
+/*
+Matematica Basica
+*/
+INSERT INTO sare_unidades VALUES ('MAT1B',1, 'Los números');
+INSERT INTO sare_unidades VALUES ('MAT1B',2, 'Operaciones aritméticas');
+INSERT INTO sare_unidades VALUES ('MAT1B',3, 'Formas y espacio');
+INSERT INTO sare_unidades VALUES ('MAT1B',4, 'Resolución de problemas');
+
+INSERT INTO sare_unidades VALUES ('MAT2B',1, 'Los números');
+INSERT INTO sare_unidades VALUES ('MAT2B',2, 'Operaciones aritméticas');
+INSERT INTO sare_unidades VALUES ('MAT2B',3, 'Formas y espacio');
+INSERT INTO sare_unidades VALUES ('MAT2B',4, 'Resolución de problemas');
+
+INSERT INTO sare_unidades VALUES ('MAT3B',1, 'Números naturales');
+INSERT INTO sare_unidades VALUES ('MAT3B',2, 'Formas y espacio');
+INSERT INTO sare_unidades VALUES ('MAT3B',3, 'Resolución de problemas');
+
+
+INSERT INTO sare_unidades VALUES ('MAT4B',1, 'Números racionales');
+INSERT INTO sare_unidades VALUES ('MAT4B',2, 'Formas y espacio');
+INSERT INTO sare_unidades VALUES ('MAT4B',3, 'Resolución de problemas');
+
+INSERT INTO sare_unidades VALUES ('MAT5B',1, 'Tiempo y programaciones');
+INSERT INTO sare_unidades VALUES ('MAT5B',2, 'Grandes números');
+INSERT INTO sare_unidades VALUES ('MAT5B',3, 'Multiplicación y múltiplos');
+INSERT INTO sare_unidades VALUES ('MAT5B',4, 'Divisiones y divisores');
+INSERT INTO sare_unidades VALUES ('MAT5B',5, 'Geometría');
+
+INSERT INTO sare_unidades VALUES ('MAT6B',1, 'Números naturales en la vida cotidiana ');
+INSERT INTO sare_unidades VALUES ('MAT6B',2, 'Multiplicación de fracciones y división de fracciones');
+INSERT INTO sare_unidades VALUES ('MAT6B',3, 'Fracciones y decimales en la vida cotidiana');
+INSERT INTO sare_unidades VALUES ('MAT6B',4, 'Números decimales');
+INSERT INTO sare_unidades VALUES ('MAT6B',5, 'Geometría');
+
+INSERT INTO sare_unidades VALUES ('MAT7B',1, 'Números decimales en la vida cotidiana');
+INSERT INTO sare_unidades VALUES ('MAT7B',2, 'Geometría: prismas, pirámides y triángulos');
+INSERT INTO sare_unidades VALUES ('MAT7B',3, 'Sistemas de numeración en la historia y actuales');
+INSERT INTO sare_unidades VALUES ('MAT7B',4, 'Relaciones de proporcionalidad');
+INSERT INTO sare_unidades VALUES ('MAT7B',5, 'Potencias en la geometría y en los números');
+
+INSERT INTO sare_unidades VALUES ('MAT8B',1, 'Polígonos, circunferencias, áreas y perímetros');
+INSERT INTO sare_unidades VALUES ('MAT8B',2, 'Relaciones proporcionales');
+INSERT INTO sare_unidades VALUES ('MAT8B',3, 'Números positivos y negativos. Ecuaciones');
+INSERT INTO sare_unidades VALUES ('MAT8B',4, 'Potencias');
+INSERT INTO sare_unidades VALUES ('MAT8B',5, 'Volumen');
+
+/*
+Matematica Medio
+*/
+INSERT INTO sare_unidades VALUES ('MAT1M',1, 'Números');
+INSERT INTO sare_unidades VALUES ('MAT1M',2, 'Lenguaje algebraico');
+INSERT INTO sare_unidades VALUES ('MAT1M',3, 'Transformaciones isométricas');
+INSERT INTO sare_unidades VALUES ('MAT1M',4, 'Variaciones proporcionales');
+
+INSERT INTO sare_unidades VALUES ('MAT2M',1, 'Nociones de probabilidades');
+INSERT INTO sare_unidades VALUES ('MAT2M',2, 'Semejanza de figuras planas');
+INSERT INTO sare_unidades VALUES ('MAT2M',3, 'Las fracciones en lenguaje algebraico');
+INSERT INTO sare_unidades VALUES ('MAT2M',4, 'La circunferencia y sus ángulos');
+INSERT INTO sare_unidades VALUES ('MAT2M',5, 'Ecuación de la recta y otras funciones, modelos de situaciones diarias');
+INSERT INTO sare_unidades VALUES ('MAT2M',6, 'Sistemas de ecuaciones lineales');
+
+INSERT INTO sare_unidades VALUES ('MAT3M',1, 'Las funciones cuadrática y raíz cuadrada');
+INSERT INTO sare_unidades VALUES ('MAT3M',2, 'Inecuaciones lineales');
+INSERT INTO sare_unidades VALUES ('MAT3M',3, 'Más sobre triángulos rectángulos');
+INSERT INTO sare_unidades VALUES ('MAT3M',4, 'Otro paso en el estudio de las probabilidades');
+
+
+INSERT INTO sare_unidades VALUES ('MAT4M',1, 'Estadística y probabilidad');
+INSERT INTO sare_unidades VALUES ('MAT4M',2, 'Funciones potencia, logarítmica y exponencial');
+INSERT INTO sare_unidades VALUES ('MAT4M',3, 'Geometría');
+
+
+/*
+Historia
+*/
+
+INSERT INTO sare_unidades VALUES ('HIS1B',1, 'Agrupaciones e instituciones sociales próximas');
+INSERT INTO sare_unidades VALUES ('HIS1B',2, 'Diversidad del entorno local');
+INSERT INTO sare_unidades VALUES ('HIS1B',3, 'Identidad corporal');
+INSERT INTO sare_unidades VALUES ('HIS1B',4, 'Legado cultural nacional');
+INSERT INTO sare_unidades VALUES ('HIS1B',5, 'Orientación en el espacio-tiempo');
+INSERT INTO sare_unidades VALUES ('HIS1B',6, 'Reconocimiento de unidades de medidas convencionales');
+INSERT INTO sare_unidades VALUES ('HIS1B',7, 'Sentido del pasado');
+
+INSERT INTO sare_unidades VALUES ('HIS2B',1, 'Agrupaciones e instituciones sociales próximas');
+INSERT INTO sare_unidades VALUES ('HIS2B',2, 'Profesiones, oficios y otras actividades laborales');
+INSERT INTO sare_unidades VALUES ('HIS2B',3, 'Diversidad del entorno local');
+INSERT INTO sare_unidades VALUES ('HIS2B',4, 'Interacción biológica en el entorno');
+
+INSERT INTO sare_unidades VALUES ('HIS3B',1, 'El Universo');
+INSERT INTO sare_unidades VALUES ('HIS3B',2, 'Ubicación y representación espacial');
+INSERT INTO sare_unidades VALUES ('HIS3B',3, 'Principios básicos de clasificación');
+INSERT INTO sare_unidades VALUES ('HIS3B',4, 'Interacción entre seres vivos y ambiente');
+INSERT INTO sare_unidades VALUES ('HIS3B',5, 'Actividades de la vida comunitaria');
+
+INSERT INTO sare_unidades VALUES ('HIS4B',1, 'Zonas climáticas de la Tierra');
+INSERT INTO sare_unidades VALUES ('HIS4B',2, 'Culturas originarias de Chile');
+INSERT INTO sare_unidades VALUES ('HIS4B',3, 'Pueblos nómades y sedentarios');
+INSERT INTO sare_unidades VALUES ('HIS4B',4, 'Principios básicos de clasificación');
+INSERT INTO sare_unidades VALUES ('HIS4B',5, 'Interacción entre seres vivos y ambiente');
+INSERT INTO sare_unidades VALUES ('HIS4B',6, 'Los estados de la materia y la vida');
+
+INSERT INTO sare_unidades VALUES ('HIS5B',1, 'Sistema de coordenadas geográficas y mapas');
+INSERT INTO sare_unidades VALUES ('HIS5B',2, 'América precolombina');
+INSERT INTO sare_unidades VALUES ('HIS5B',3, 'Expansión europea, descubrimiento de América y conquista de América');
+INSERT INTO sare_unidades VALUES ('HIS5B',4, 'Relación sociedad-paisaje');
+
+INSERT INTO sare_unidades VALUES ('HIS6B',1, 'El territorio de Chile, sus principales características geográfico-físicas y su organización administrativa');
+INSERT INTO sare_unidades VALUES ('HIS6B',2, 'La Independencia y la formación del Estado nacional');
+INSERT INTO sare_unidades VALUES ('HIS6B',3, 'Definiciones territoriales y cambios políticos y sociales a fines del siglo XIX');
+INSERT INTO sare_unidades VALUES ('HIS6B',4, 'Chile en el siglo XX');
+INSERT INTO sare_unidades VALUES ('HIS6B',5, 'Economía y vida cotidiana');
+
+INSERT INTO sare_unidades VALUES ('HIS7B',1, 'La Tierra como sistema');
+INSERT INTO sare_unidades VALUES ('HIS7B',2, 'De los albores de la humanidad a las culturas clásicas del mediterráneo');
+INSERT INTO sare_unidades VALUES ('HIS7B',3, 'El mundo occidental: de la Época medieval a la moderna');
+INSERT INTO sare_unidades VALUES ('HIS7B',4, 'Dos revoluciones conforman el mundo contemporáneo');
+
+INSERT INTO sare_unidades VALUES ('HIS8B',1, 'La humanidad en los inicios de un nuevo siglo');
+INSERT INTO sare_unidades VALUES ('HIS8B',2, 'Procesos políticos que marcaron el siglo XX');
+INSERT INTO sare_unidades VALUES ('HIS8B',3, 'Problemas del mundo actual y esfuerzos por superarlos: la pobreza');
+INSERT INTO sare_unidades VALUES ('HIS8B',4, 'Derechos y deberes que conlleva la vida en sociedad');
+
+INSERT INTO sare_unidades VALUES ('HIS1M',1, 'Entorno natural y comunidad regional');
+INSERT INTO sare_unidades VALUES ('HIS1M',2, 'Territorio regional y nacional ');
+INSERT INTO sare_unidades VALUES ('HIS1M',3, 'Organización política');
+INSERT INTO sare_unidades VALUES ('HIS1M',4, 'Organización económica');
+
+INSERT INTO sare_unidades VALUES ('HIS2M',1, 'conociendo la Historia de Chile');
+INSERT INTO sare_unidades VALUES ('HIS2M',2, 'Construcción de una identidad mestiza');
+INSERT INTO sare_unidades VALUES ('HIS2M',3, 'La creación de una nación');
+INSERT INTO sare_unidades VALUES ('HIS2M',4, 'La sociedad finisecular: auge y crisis del liberalismo');
+INSERT INTO sare_unidades VALUES ('HIS2M',5, 'El siglo XX: la búsqueda del desarrollo económico y de la justicia social');
+
+INSERT INTO sare_unidades VALUES ('HIS3M',1, 'La diversidad de civilizaciones');
+INSERT INTO sare_unidades VALUES ('HIS3M',2, 'La herencia clásica: Grecia y Roma como raíces de la civilización occidental');
+INSERT INTO sare_unidades VALUES ('HIS3M',3, 'La Europa medieval y el cristianismo');
+INSERT INTO sare_unidades VALUES ('HIS3M',4, 'El humanismo y el desarrollo del pensamiento científico');
+INSERT INTO sare_unidades VALUES ('HIS3M',5, 'La era de las revoluciones y la conformación del mundo contemporáneo ');
+
+
+INSERT INTO sare_unidades VALUES ('HIS4M',1, 'Antecedentes históricos para la comprensión del orden mundial actual');
+INSERT INTO sare_unidades VALUES ('HIS4M',2, 'América Latina contemporánea');
+INSERT INTO sare_unidades VALUES ('HIS4M',3, 'El mundo actual ');

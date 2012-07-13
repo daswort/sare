@@ -58,6 +58,19 @@ class Bd extends PDO {
       throw $e;
     }
   }
+  
+  public function insertAll($datos) {
+
+    $sentencia = implode(" ", array_values($datos)); 	
+    try {
+      $sql = $this->prepare("INSERT ALL $sentencia SELECT 1 FROM DUAL");
+      $sql->execute();
+      echo $sql;
+      	
+    } catch(PDOException $e) {
+      throw $e;
+    }
+  }
 
   /**
    * procAlmac

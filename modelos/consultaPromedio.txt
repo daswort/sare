@@ -1,0 +1,4 @@
+select distinct su.rut, su.nombres, su.apaterno, su.amaterno, se.codigo_unid, avg(se.puntaje_unid)
+from sare_usuarios su, sare_matriculas sm, sare_evaluaciones se
+where su.rut = sm.rut_alum
+group by su.rut, su.nombres, su.apaterno, su.amaterno, se.codigo_unid

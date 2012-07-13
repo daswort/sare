@@ -1,15 +1,34 @@
 $(function() {
-	$.get('feedback/selectCursos', { 'nivel': 'b' } , function (o){
-		for (var i = 0; i < o.length; i++){			
-			$('#select-cursos-basica').append('<option value="' + o[i].GRADO_CURSO + o[i].LETRA_CURSO + o[i].NIVEL_CURSO + '">' + o[i].GRADO_CURSO + '&#176; B&aacute;sico ' + o[i].LETRA_CURSO.toUpperCase() + '</option>');
+	$.get('usuario/ajaxListaUsuarios', { 'permiso': 'prof' }, function(o) {
+		for(var i = 0; i < o.length; i++ ){
+			$('#select-prof').append('<option value="' + o[i].RUT + '">' + o[i].NOMBRES + ' ' + o[i].APATERNO + '</option>');
 		}
 	}, 'json');
-	$.get('feedback/selectCursos', { 'nivel': 'm' } , function (o){
+	$.get('clase/selectCursos', { 'nivel': 'b' } , function (o){
+		for (var i = 0; i < o.length; i++){			
+			$('#select-cursos-basica').append('<option value="' + o[i].GRADO + o[i].LETRA + o[i].NIVEL + '">' + o[i].GRADO + '&#176; B&aacute;sico ' + o[i].LETRA.toUpperCase() + '</option>');
+		}
+	}, 'json');
+	$.get('clase/selectCursos', { 'nivel': 'm' } , function (o){
 		for (var i = 0; i < o.length; i++){			
 			$('#select-cursos-media').append('<option value="' + o[i].GRADO + o[i].LETRA + o[i].NIVEL + '">' + o[i].GRADO + '&#176; Medio ' + o[i].LETRA.toUpperCase() + '</option>');
 		}
 	}, 'json');
-	
+	$('#select-prof').change(function(){
+		$('#verifica-profe').removeAttr('checked');
+	});
+	$('#verifica-profe:checked').live('click', function(){
+		var rutProf = $('#select-prof').val();
+		$.get('clase/verificaProfJefe',{ 'rut-profesor': rutProf  }, function (o){
+			if (jQuery.isEmptyObject(o) == false) {
+				$("#resp-verifica").animate({ 'height':'toggle','opacity':'toggle'});
+				window.setTimeout( function(){
+					$("#resp-verifica").slideUp();
+				}, 3500);
+				$('#verifica-profe').removeAttr('checked');
+			}
+		}, 'json');
+	});
 	$('#r-basica:checked').live('click', function (){
 		$('.option-default').attr('selected','selected');
 		$('#select-cursos-basica').removeAttr('disabled');
@@ -24,8 +43,7 @@ $(function() {
 	$('#select-cursos-basica').live('change', function (){
 		$('.op-asig-b').remove();
 		var grado = $(this).val().substr(0,1);
-		var letra = $(this).val().substr(1,1);
-		$.get('feedback/selectAsignaturas', { 'nivel': 'b', 'grado': grado, 'letra': letra } , function (o){
+		$.get('clase/selectAsignaturas', { 'nivel': 'b', 'grado': grado } , function (o){
 			for (var i = 0; i < o.length; i++){			
 				$('#select-asignaturas-basica').append('<option class="op-asig-b" value="' + o[i].CODIGO + '">' + o[i].NOMBRE + '</option>');
 			}
@@ -46,32 +64,24 @@ $(function() {
 	$('#select-cursos-media').live('change', function (){
 		$('.op-asig-m').remove();
 		var grado = $(this).val().substr(0,1);
-		$.get('feedback/selectAsignaturas', { 'nivel': 'm', 'grado': grado } , function (o){
+		$.get('clase/selectAsignaturas', { 'nivel': 'm', 'grado': grado } , function (o){
 			for (var i = 0; i < o.length; i++){			
 				$('#select-asignaturas-media').append('<option class="op-asig-m" value="' + o[i].CODIGO + '">' + o[i].NOMBRE + '</option>');
 			}
 		}, 'json');
 	});
-	
-	var bar = $('.bar');
-    var percent = $('.percent');
-    var status = $('#status');
-
-    $('#form-feedback').ajaxForm({
-        beforeSend: function () {
-            status.empty();
-            var percentVal = '0%';
-            bar.width(percentVal)
-            percent.html(percentVal);
-        },
-        uploadProgress: function (event, position, total, percentComplete) {
-            var percentVal = percentComplete + '%';
-            bar.width(percentVal)
-            percent.html(percentVal);
-            //console.log(percentVal, position, total);
-        },
-        complete: function (xhr) {
-            status.html(xhr.responseText);
-        }
+	$('#form-clases').live('submit', function () {
+        var url = $(this).attr('action');
+        var data = $(this).serialize();
+        $.post(url, data, function (o) {
+        	$("#alerta-creacion").animate({ 'height':'toggle','opacity':'toggle'});
+            window.setTimeout( function(){
+                $("#alerta-creacion").slideUp();
+            }, 2500);
+        }, 'json');
+		$('#verifica-profe').removeAttr('checked');
+        $('.inputusuario').val("");
+		$('.option-default').attr('selected','selected');
+        return false;
     });
 });

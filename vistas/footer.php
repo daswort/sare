@@ -12,9 +12,10 @@
 <!-- /container -->
 
 <script type="text/javascript" src="<?php echo URL; ?>publico/js/jquery.min.js"></script>
-<script type="text/javascript" src="http://malsup.github.com/jquery.form.js"></script>
+<script type="text/javascript" src="<?php echo URL; ?>publico/js/jquery.form.js"></script>
 <script type="text/javascript" src="<?php echo URL; ?>publico/js/custom.js"></script>
 <script type="text/javascript" src="<?php echo URL; ?>publico/js/bootstrap.js"></script>
+
 <?php
 if (isset($this->js)) {
   foreach ($this->js as $js){
