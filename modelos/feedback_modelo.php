@@ -15,19 +15,19 @@ class Feedback_Modelo extends Modelo {
 
     $nivel = $_GET['nivel'];
     $resultado = $this->bd->select("SELECT DISTINCT grado_curso, letra_curso, nivel_curso 
-									FROM sare_clases
-									WHERE nivel_curso = '$nivel'");
+    				    FROM sare_clases 
+    				    WHERE nivel_curso = '$nivel'");
     echo json_encode($resultado);
   }
 
   public function selectAsignaturas() {
 
     $resultado = $this->bd->select("SELECT DISTINCT sa.codigo, sa.nombre 
-									FROM sare_clases sc, sare_asignaturas sa
-									WHERE sa.codigo = sc.codigo_asig
-									AND sc.grado_curso = '" . $_GET['grado'] . "'
-									AND sc.letra_curso = '" . $_GET['letra'] . "'
-									AND sc.nivel_curso = '" . $_GET['nivel'] . "'");
+				    FROM sare_clases sc, sare_asignaturas sa
+				    WHERE sa.codigo = sc.codigo_asig
+				    AND sc.grado_curso = '" . $_GET['grado'] . "'
+				    AND sc.letra_curso = '" . $_GET['letra'] . "'
+				    AND sc.nivel_curso = '" . $_GET['nivel'] . "'");
     echo json_encode($resultado);
   }
   
@@ -40,7 +40,7 @@ class Feedback_Modelo extends Modelo {
 	  $nombreExcel[] = $value['B'];
 	}
 	$rutBd = $this->bd->select("SELECT rut_alum 
-								FROM sare_alumnos");
+				    FROM sare_alumnos");
 	if(empty($rutBd)){
 	  $rutBd = array(0);
 	}
@@ -69,32 +69,32 @@ class Feedback_Modelo extends Modelo {
 	  $j++;
 	}
 	$existeCurso = $this->bd->select("SELECT DISTINCT grado_curso, letra_curso, nivel_curso
-									  FROM sare_matriculas
-									  WHERE grado_curso = '" . $datosEval['curso'][0] . "'
-									  AND letra_curso = '" . $datosEval['curso'][1] . "'
-									  AND nivel_curso = '" . $datosEval['curso'][2] . "'");
+					  FROM sare_matriculas
+					  WHERE grado_curso = '" . $datosEval['curso'][0] . "'
+					  AND letra_curso = '" . $datosEval['curso'][1] . "'
+					  AND nivel_curso = '" . $datosEval['curso'][2] . "'");
 	
 	if(empty($existeCurso)) {
 	  $codigo = $this->bd->select("SELECT codigo_estab 
-		   						   FROM sare_administrativos 
-								   WHERE rut_adm = '" . Sesion::get('id') . "'");
+		   		       FROM sare_administrativos 
+				       WHERE rut_adm = '" . Sesion::get('id') . "'");
 	  $profeJefe = $this->bd->select("SELECT DISTINCT rut_prof, anio_clase
-									  FROM sare_clases
-									  WHERE ej = 1
-									  AND grado_curso = '" . $datosEval['curso'][0] . "'
-									  AND letra_curso = '" . $datosEval['curso'][1] . "'
-									  AND nivel_curso = '" . $datosEval['curso'][2] . "'");
+					  FROM sare_clases
+					  WHERE ej = 1
+					  AND grado_curso = '" . $datosEval['curso'][0] . "'
+					  AND letra_curso = '" . $datosEval['curso'][1] . "'
+					  AND nivel_curso = '" . $datosEval['curso'][2] . "'");
 	  foreach($datosAlum as $key=>$value){
 	    if($value['A'] == 0) continue;
 	    $insert[] = "INTO sare_matriculas VALUES('" . $profeJefe[0]['RUT_PROF'] . "','" . $codigo[0]['CODIGO_ESTAB'] . "','" . $datosEval['curso'][0] . "','" . $datosEval['curso'][1] . "','" . $datosEval['curso'][2] . "','" . $profeJefe[0]['ANIO_CLASE'] . "','" . $value['A'] . "')";
 	  }
 	}
 	$unidades = $this->bd->select("SELECT codigo_unid 
-								   FROM sare_unidades 
-								   WHERE codigo_asig = '" . $datosEval['asignatura'] . "'");
+				       FROM sare_unidades 
+				       WHERE codigo_asig = '" . $datosEval['asignatura'] . "'");
 	$profesor = $this->bd->select("SELECT DISTINCT rut_prof 
-								   FROM sare_clases 
-								   WHERE codigo_asig = '" . $datosEval['asignatura'] . "'");
+				       FROM sare_clases 
+				       WHERE codigo_asig = '" . $datosEval['asignatura'] . "'");
 	for($i = 1; $i <= count($datosAlum); $i++){
 		$ojala[] = array_values($datosAlum[$i]);
 	}
